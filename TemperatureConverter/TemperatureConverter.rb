@@ -67,7 +67,7 @@ class TempConversion
         end
 
         if targetScale[/^[Kk]$/]
-            @temperature = 5 * (@temperature - 32) / 9 + 273.15
+            @targetTemp = 5 * (@temperature - 32) / 9 + 273.15
         end
     end
 end
