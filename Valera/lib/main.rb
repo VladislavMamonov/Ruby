@@ -15,9 +15,8 @@ class Main
       @interface.print_status(@valera)
       @interface.print_actions
 
-      if @reader.read_action(@game) == false
+      while @reader.read_action(@game) == false
         puts('Ошибка! Такого действия нет. Введите значение в диапозоне от 1 до 10')
-        @reader.read_action(@game)
       end
 
       @valera = @game.do_action
