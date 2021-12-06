@@ -1,7 +1,6 @@
 require './reader'
 
-describe '.reader' do
-
+describe '.reader_false' do
   context 'read_action_true_1' do
     it {
       game = Game.new
@@ -19,7 +18,9 @@ describe '.reader' do
       expect(reader.read_action(game)).to eq false
     }
   end
+end
 
+describe '.reader_true' do
   context 'read_action_true_2' do
     it {
       game = Game.new
@@ -37,5 +38,4 @@ describe '.reader' do
       expect(reader.read_action(game)).to eq false
     }
   end
-
 end
