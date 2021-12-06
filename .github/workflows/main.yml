@@ -19,3 +19,5 @@ jobs:
         run: bundle exec rubocop
       - name: RSpec Lab1
         run: cd TemperatureConverter && bundle exec rspec
+      - name: RSpec Valera
+        run: cd Valera && bundle exec rspec
