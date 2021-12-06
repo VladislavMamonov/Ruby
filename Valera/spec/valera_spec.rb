@@ -1,4 +1,4 @@
-require './valera'
+require './lib/valera'
 
 describe '.valera_check' do
   valera = Valera.new

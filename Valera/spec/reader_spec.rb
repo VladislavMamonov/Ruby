@@ -1,4 +1,4 @@
-require './reader'
+require './lib/reader'
 
 describe '.reader_false' do
   context 'read_action_true_1' do

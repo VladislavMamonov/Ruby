@@ -1,4 +1,4 @@
-require './game'
+require './lib/game'
 
 describe '.check_action' do
   context 'false' do

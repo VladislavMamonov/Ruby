@@ -1,4 +1,4 @@
-require './actions'
+require './lib/actions'
 
 describe '.actions_work_rest_series_drink' do
   status = { 'mana' => 30, 'happiens' => 5, 'stamina' => 30, 'money' => 10_000 }
