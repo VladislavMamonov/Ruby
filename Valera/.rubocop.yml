@@ -13,14 +13,12 @@ Style/FrozenStringLiteralComment:
 Metrics/MethodLength:
   Max: 25
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 150
 
 Metrics/AbcSize:
   Max: 50
 
-Style/EndOfLine:
-  EnforcedStyle: lf
-
 Layout/EndOfLine:
+  EnforcedStyle: lf
   Enabled: False
