@@ -15,8 +15,10 @@ jobs:
         run: |
           gem install bundler
           bundle install --jobs 4 --retry 3
-      - name: Rubocop
-        run: bundle exec rubocop
+      - name: Rubocop_converter
+        run: cd TemperatureConverter && bundle exec rubocop
+      - name: Rubocop_Valera
+        run: cd Valera && bundle exec rubocop
       - name: RSpec Lab1
         run: cd TemperatureConverter && bundle exec rspec
       - name: RSpec Valera
