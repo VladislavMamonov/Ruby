@@ -1,44 +1,77 @@
-require_relative 'valera'
-require_relative 'actions'
-require_relative 'saver'
+require_relative './game_states'
+require_relative './actions'
 
 class Game
-  attr_accessor :action_item, :valera, :actions
+  include GameStates
 
-  @actions = {
-    1 => ->(status) { Actions.go_work(status) },
-    2 => ->(status) { Actions.rest(status) },
-    3 => ->(status) { Actions.drink_with_marginals(status) },
-    4 => ->(status) { Actions.sing(status) },
-    5 => ->(status) { Actions.watch_series(status) },
-    6 => ->(status) { Actions.sleep(status) },
-    7 => ->(status) { Saver.save_load_menu(status, 7) },
-    8 => ->(status) { Saver.save_load_menu(status, 8) },
-    9 => ->(status) { Actions.new_game(status) },
-    10 => ->(_status) { exit }
-  }
-
-  def initialize
-    @valera = Valera.new
+  def initialize(view, file_manager, input)
+    @view = view
+    @file_manager = file_manager
+    @input = input
   end
 
-  class << self
-    attr_reader :actions
+  def start_menu
+    @view.start_menu
+    input = @input.key.to_i
+    case input
+    when 1
+      [RUNNING, Valera.new]
+    when 2
+      saved_game = @file_manager.load_game
+      [RUNNING, Valera.new(saved_game)]
+    when 3
+      EXIT
+    else
+      MENU
+    end
   end
 
-  def check_action(status)
-    return (@valera.status['mana'] >= 70) || (@valera.check_status(status) == false) if @action_item == 1
-
-    @valera.check_status(status) == false
+  def start
+    game
   end
 
-  def do_action
-    status = Game.actions[@action_item].call(@valera.status.clone)
-    system('clear')
-    puts("\nНедопустимое действие! Попробуйте снова") if check_action(status)
-    return false if @valera.status['happiens'] <= -10
-    return true if @valera.status['money'] >= 40_000
+  def game
+    config = @file_manager.load_config
+    state = MENU
+    valera = Valera.new
+    error = nil
 
-    valera
+    loop do
+      case state
+      when MENU
+        state, valera = start_menu
+      when RUNNING
+        state, valera, error = game_step(config, valera, error)
+      when EXIT
+        return
+      end
+    end
+  end
+
+  def game_step(config, valera, error)
+    @view.ui(valera, error)
+    input = @input.key
+    case input
+    when 'q'
+      @view.print_exit
+      return EXIT, valera
+    when 'm'
+      @file_manager.save(valera)
+      return MENU, valera
+    when 's'
+      @file_manager.save(valera)
+      @view.print_saved
+      @input.key
+    end
+    input = input.to_i - 1
+    return RUNNING, valera if input.negative? || input > config['actions'].length - 1
+
+    error = Actions.new.do_action(config['actions'][input], valera)
+
+    if valera.dead?
+      @view.game_over
+      return MENU, valera
+    end
+    [RUNNING, valera, error]
   end
 end

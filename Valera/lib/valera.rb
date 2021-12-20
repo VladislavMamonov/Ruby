@@ -1,44 +1,40 @@
 class Valera
-  attr_accessor :status
+  attr_reader :health, :alcohol, :happy, :tired
+  attr_accessor :money
 
-  def initialize(mana = 0, happiens = 0, money = 0, stamina = 0)
-    @status = {
-      'mana' => mana,
-      'happiens' => happiens,
-      'stamina' => stamina,
-      'money' => money
-    }
+  def initialize(params = {})
+    params ||= {}
+    @health = params['health'] || 100
+    @alcohol = params['alcohol'] || 0
+    @happy = params['happy'] || 0
+    @tired = params['tired'] || 0
+    @money = params['money'] || 300
   end
 
-  def check_status(status)
-    fix_status(status)
-    if check_mana(status['mana']) && check_happiens(status['happiens']) \
-       && check_stamina(status['stamina']) && check_money(status['money'])
-      @status = status
-      return true
-    end
-    false
+  def dead?
+    @health.zero? || @happy == -10 || @money <= -100 || @tired == 100
   end
 
-  def fix_status(status)
-    status['mana'] = 0 if (status['mana']).negative?
-    status['happiens'] = 10 if status['happiens'] > 10
-    status['stamina'] = 0 if (status['stamina']).negative?
+  def health=(health)
+    @health = validate(health, 0, 100)
   end
 
-  def check_mana(mana)
-    mana >= 0 && mana <= 100
+  def alcohol=(alcohol)
+    @health -= validate(@alcohol - alcohol, 0, @health) if @alcohol < alcohol.abs
+    @alcohol = validate(alcohol, 0, 100)
   end
 
-  def check_happiens(happiens)
-    happiens <= 10
+  def happy=(happy)
+    @happy = validate(happy, -10, 10)
   end
 
-  def check_stamina(stamina)
-    stamina >= 0 && stamina <= 100
+  def tired=(tired)
+    @tired = validate(tired, 0, 100)
   end
 
-  def check_money(money)
-    money >= 0
+  private
+
+  def validate(value, min, max)
+    [[value, max].min, min].max
   end
 end

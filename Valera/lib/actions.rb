@@ -1,54 +1,34 @@
-require_relative 'valera'
+require_relative './file_manager'
+require_relative './view'
+require 'json'
+require 'io/console'
+require_relative './game_states'
 
 class Actions
-  def self.go_work(status)
-    status['money'] += 1250
-    status['stamina'] += 30
-    status['mana'] -= 15
-    status['happiens'] -= 5
-    status
+  def change_attribute(name, value, valera)
+    valera.send("#{name}=", valera.send(name) + value)
   end
 
-  def self.rest(status)
-    status['happiens'] += 1
-    status['stamina'] -= 30
-    status['mana'] -= 5
-    status
+  def change_attributes(action, valera)
+    action['result'].each do |effect|
+      change_attribute(effect['name'], effect['value'], valera)
+      next unless effect.include?('condition')
+
+      if valera.send(effect['condition']['name']).between?(effect['condition']['min'], effect['condition']['max'])
+        change_attribute(effect['name'], effect['condition']['value'], valera)
+      end
+    end
   end
 
-  def self.drink_with_marginals(status)
-    status['mana'] += 25
-    status['happiens'] += 3
-    status['money'] -= 1500
-    status
-  end
-
-  def self.sing(status)
-    status['money'] += 50 if status['mana'] >= 30
-    status['happiens'] += 1
-    status['mana'] -= 15
-    status
-  end
-
-  def self.watch_series(status)
-    status['happiens'] += 2
-    status['stamina'] -= 15
-    status['mana'] -= 5
-    status
-  end
-
-  def self.sleep(status)
-    status['happiens'] += 1
-    status['stamina'] -= 75
-    status['mana'] -= 30
-    status
-  end
-
-  def self.new_game(status)
-    status['money'] = 0
-    status['stamina'] = 0
-    status['mana'] = 0
-    status['happiens'] = 0
-    status
+  def do_action(action, valera)
+    unless action['conditions'].size.zero?
+      action['conditions'].each do |condition|
+        unless valera.send(condition['name']).between?(condition['min'], condition['max'])
+          return "\nПараметр Валеры #{condition['name']} должен быть в промежутке от #{condition['min']} до #{condition['max']}\n"
+        end
+      end
+    end
+    change_attributes(action, valera)
+    nil
   end
 end
